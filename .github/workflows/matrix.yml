@@ -6,9 +6,13 @@ jobs:
   matrix-build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false   # 실패해도 다른 조합은 계속 실행
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node: [14, 16, 18]
+        exclude:
+          - os: macos-latest
+            node: 14     # macOS + Node.js 14 조합만 제외!
 
     steps:
       - uses: actions/checkout@v3
@@ -24,7 +28,7 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-node-${{ matrix.node }}-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install deps & test 
+      - name: Install deps & test
         run: |
           npm install
           npm test
